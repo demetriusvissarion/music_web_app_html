@@ -1,7 +1,32 @@
 ## Exercise
 
-Create a new project `music_web_app_html` using [the new HTML starter for this
-phase](https://github.com/makersacademy/web-applications-in-python-project-starter-html).
+Create a new project `music_web_app_html`
+# Install dependencies and set up the virtual environment
+; pipenv install
+
+# Activate the virtual environment
+; pipenv shell
+
+# Install the virtual browser we will use for testing
+; playwright install
+# If you have problems with the above, contact your coach
+
+# Create a test and development database
+; createdb YOUR_PROJECT_NAME
+; createdb YOUR_PROJECT_NAME_test
+
+# Open lib/database_connection.py and change the database names
+; open lib/database_connection.py
+
+# Seed the development database (ensure you have run `pipenv shell` first)
+; python seed_dev_database.py
+
+# Run the tests (with extra logging)
+; pytest -sv
+
+# Run the app
+; python app.py
+# Now visit http://localhost:5001/emoji in your browser
 
 You can copy over your albums-related code from the previous challenges if you want
 to, rather than starting over from scratch. You'll probably want these files
@@ -65,7 +90,19 @@ too.
 
 </details>
 
-[Example solution](https://www.youtube.com/watch?v=1GcIg1lDTC4&t=0s)
+Issues:
+1. db_connection.seed("seeds/music_web_app_html.sql") doesn't work for:
+tests/test_app.py::test_get_all_records[chromium] FAILED
+tests/test_app.py::test_get_all_artists_string FAILED
+tests/test_app.py::test_post_new_artist FAILED
+
+2. 
+
+
+
+
+
+
 
 ## Challenge
 
