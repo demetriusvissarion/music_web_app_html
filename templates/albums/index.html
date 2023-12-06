@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>albums</title>
+        <title>Album List</title>
         <meta charset="utf-8">
     </head>
     <body>
@@ -12,10 +12,7 @@
         {% for album in albums %}
             <div>
                 <p>
-                    Title: {{ album.title }}
-                </p>
-                <p>
-                    Released: {{ album.release_year }}
+                    <a href="/albums/{{album.album_id}}">{{ album.title }}</a>
                 </p>
             </div>
         {% endfor %}

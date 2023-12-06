@@ -47,7 +47,7 @@ def test_get_all_records(page, test_web_address, db_connection):
 
     paragraph_tags = page.locator("p")
 
-    expect(paragraph_tags).to_have_text(['\n                    Title: Doolittle\n                ', '\n                    Released: 1989\n                ', '\n                    Title: Surfer Rosa\n                ', '\n                    Released: 1988\n                ', '\n                    Title: Waterloo\n                ', '\n                    Released: 1974\n                ', '\n                    Title: Super Trouper\n                ', '\n                    Released: 1980\n                ', '\n                    Title: Bossanova\n                ', '\n                    Released: 1990\n                ', '\n                    Title: Lover\n                ', '\n                    Released: 2019\n                ', '\n                    Title: Folklore\n                ', '\n                    Released: 2020\n                ', '\n                    Title: I Put a Spell on You\n                ', '\n                    Released: 1965\n                ', '\n                    Title: Baltimore\n                ', '\n                    Released: 1978\n                ', '\n                    Title: Here Comes the Sun\n                ', '\n                    Released: 1971\n                ', '\n                    Title: Fodder on My Wings\n                ', '\n                    Released: 1982\n                ', '\n                    Title: Ring Ring\n                ', '\n                    Released: 1973\n                '])
+    expect(paragraph_tags).to_have_text(['\n                    Doolittle\n                ', '\n                    Surfer Rosa\n                ', '\n                    Waterloo\n                ', '\n                    Super Trouper\n                ', '\n                    Bossanova\n                ', '\n                    Lover\n                ', '\n                    Folklore\n                ', '\n                    I Put a Spell on You\n                ', '\n                    Baltimore\n                ', '\n                    Here Comes the Sun\n                ', '\n                    Fodder on My Wings\n                ', '\n                    Ring Ring\n                '])
 
 
 # """
@@ -131,4 +131,21 @@ def test_show_album_1(page, test_web_address, db_connection):
 
     paragraph_tags = page.locator("p")
 
-    expect(paragraph_tags).to_have_text(['\n                    Title: Doolittle\n                ', '\n                    Released: 1989\n                '])
+    expect(paragraph_tags).to_have_text(['\n                Released: 1989\n            '])
+
+
+"""
+The page returned by `GET /albums` should contain a link for each album listed. It should link to `/albums/<id>`, where `<id>` is the corresponding album's id. That page should then show information about the specific album.
+"""
+
+def test_click_album_sends_to_page_and_go_back(page, test_web_address, db_connection):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/albums")
+    page.click("text='Waterloo'")
+    h1_tag = page.locator("h1")
+    expect(h1_tag).to_have_text("Album: Waterloo")
+    paragraph_tag = page.locator("p")
+    expect(paragraph_tag).to_have_text("Released: 1974")
+    page.click("text='Back to all albums'")
+    h1_tag = page.locator("h1")
+    expect(h1_tag).to_have_text("Albums")

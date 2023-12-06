@@ -3,18 +3,16 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>albums</title>
+        <title>Single Album</title>
         <meta charset="utf-8">
     </head>
     <body>
-        <h1>Albums</h1>
-            <div>
-                <p>
-                    Title: {{ album.title }}
-                </p>
-                <p>
-                    Released: {{ album.release_year }}
-                </p>
-            </div>
+        <h1>Album: {{ album.title }}</h1>
+        <p>
+            Released: {{ album.release_year }}
+        </p>
+        <br>
+        <a href="/albums/">Back to all albums</a>
+
     </body>
 </html>
