@@ -64,6 +64,14 @@ def get_all_records():
     return render_template('albums/index.html', albums=albums)
 
 
+@app.route('/albums/<int:album_id>', methods=['GET'])
+def get_album_by_id(album_id):
+    connection = get_flask_database_connection(app)
+    album_repository = AlbumRepository(connection)
+    album = album_repository.find(album_id)
+    return render_template('albums/show.html', album=album)
+
+
 # Request:
 # GET /artists
 #   With body parameter: 

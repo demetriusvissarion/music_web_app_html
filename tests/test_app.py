@@ -44,8 +44,7 @@ Then: I should get a 200 response with a list of records, as html
 def test_get_all_records(page, test_web_address, db_connection):
     db_connection.seed("seeds/music_web_app_html.sql")
     page.goto(f"http://{test_web_address}/albums")
-    # page.wait_for_load_state("load")
-    # page.wait_for_selector("div", timeout=60000)
+
     paragraph_tags = page.locator("p")
 
     expect(paragraph_tags).to_have_text(['\n                    Title: Doolittle\n                ', '\n                    Released: 1989\n                ', '\n                    Title: Surfer Rosa\n                ', '\n                    Released: 1988\n                ', '\n                    Title: Waterloo\n                ', '\n                    Released: 1974\n                ', '\n                    Title: Super Trouper\n                ', '\n                    Released: 1980\n                ', '\n                    Title: Bossanova\n                ', '\n                    Released: 1990\n                ', '\n                    Title: Lover\n                ', '\n                    Released: 2019\n                ', '\n                    Title: Folklore\n                ', '\n                    Released: 2020\n                ', '\n                    Title: I Put a Spell on You\n                ', '\n                    Released: 1965\n                ', '\n                    Title: Baltimore\n                ', '\n                    Released: 1978\n                ', '\n                    Title: Here Comes the Sun\n                ', '\n                    Released: 1971\n                ', '\n                    Title: Fodder on My Wings\n                ', '\n                    Released: 1982\n                ', '\n                    Title: Ring Ring\n                ', '\n                    Released: 1973\n                '])
@@ -120,3 +119,16 @@ def test_post_new_artist(db_connection, test_web_address, web_client):
     assert get_response.data.decode('utf-8') == "" \
         'Pixies, ABBA, Taylor Swift, Nina Simone, Queen'
 
+
+"""
+Given an album id
+Entering the number in the url (.../albums/1) returns album with id=1 from the DB
+"""
+def test_show_album_1(page, test_web_address, db_connection):
+    db_connection.seed("seeds/music_web_app_html.sql")
+
+    page.goto(f"http://{test_web_address}/albums/1")
+
+    paragraph_tags = page.locator("p")
+
+    expect(paragraph_tags).to_have_text(['\n                    Title: Doolittle\n                ', '\n                    Released: 1989\n                '])
