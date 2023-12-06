@@ -75,12 +75,20 @@ def get_album_by_id(album_id):
 # Request:
 # GET /artists
 #   With body parameter: 
-@app.route('/artists', methods=['GET'])
-def get_all_artists_string():
+@app.route('/artists/', methods=['GET'])
+def get_all_artists():
     connection = get_flask_database_connection(app)
     repository = ArtistRepository(connection)
     artists = repository.all() # Get all artists
-    return ", ".join([artist.artist_name for artist in artists])
+    return render_template('artists/index.html', artists=artists)
+
+
+@app.route('/artists/<artist_id>', methods=['GET'])
+def get_artist_by_id(artist_id):
+    connection = get_flask_database_connection(app)
+    artist_repository = ArtistRepository(connection)
+    artist = artist_repository.find(artist_id)
+    return render_template('artists/show.html', artist=artist)
 
 
 # Request:

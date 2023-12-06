@@ -86,38 +86,38 @@ def test_get_all_records(page, test_web_address, db_connection):
 #         'Album(1, Doolittle, 1989, 1)\nAlbum(2, Surfer Rosa, 1988, 1)\nAlbum(3, Waterloo, 1974, 2)\nAlbum(4, Super Trouper, 1980, 2)\nAlbum(5, Bossanova, 1990, 1)\nAlbum(6, Lover, 2019, 3)\nAlbum(7, Folklore, 2020, 3)\nAlbum(8, I Put a Spell on You, 1965, 4)\nAlbum(9, Baltimore, 1978, 4)\nAlbum(10, Here Comes the Sun, 1971, 4)\nAlbum(11, Fodder on My Wings, 1982, 4)\nAlbum(12, Ring Ring, 1973, 2)'
 
 
-"""
-When: I make a GET request to /artists
-Then: I should get a 200 response and a comma separated string of all artists
-"""
-def test_get_all_artists_string(db_connection, test_web_address, web_client):
-    db_connection.seed("seeds/music_web_app_html.sql")
+# """
+# When: I make a GET request to /artists
+# Then: I should get a 200 response and a comma separated string of all artists
+# """
+# def test_get_all_artists_string(db_connection, test_web_address, web_client):
+#     db_connection.seed("seeds/music_web_app_html.sql")
 
-    get_response = web_client.get("/artists")
-    assert get_response.status_code == 200
-    assert get_response.data.decode('utf-8') == "" \
-        'Pixies, ABBA, Taylor Swift, Nina Simone'
+#     get_response = web_client.get("/artists")
+#     assert get_response.status_code == 200
+#     assert get_response.data.decode('utf-8') == "" \
+#         'Pixies, ABBA, Taylor Swift, Nina Simone'
 
 
 
-"""
-When: I make a POST request to /artists
-Then: I should get a 200 response and add a new artist to the DB
-"""
-def test_post_new_artist(db_connection, test_web_address, web_client):
-    db_connection.seed("seeds/music_web_app_html.sql")
+# """
+# When: I make a POST request to /artists
+# Then: I should get a 200 response and add a new artist to the DB
+# """
+# def test_post_new_artist(db_connection, test_web_address, web_client):
+#     db_connection.seed("seeds/music_web_app_html.sql")
 
-    post_response = web_client.post('/artists', data={
-    'artist_name': 'Queen', 
-    'genre': 'Rock'
-    })
-    assert post_response.status_code == 200
-    assert post_response.data.decode('utf-8') == ""
+#     post_response = web_client.post('/artists', data={
+#     'artist_name': 'Queen', 
+#     'genre': 'Rock'
+#     })
+#     assert post_response.status_code == 200
+#     assert post_response.data.decode('utf-8') == ""
 
-    get_response = web_client.get("/artists")
-    assert get_response.status_code == 200
-    assert get_response.data.decode('utf-8') == "" \
-        'Pixies, ABBA, Taylor Swift, Nina Simone, Queen'
+#     get_response = web_client.get("/artists")
+#     assert get_response.status_code == 200
+#     assert get_response.data.decode('utf-8') == "" \
+#         'Pixies, ABBA, Taylor Swift, Nina Simone, Queen'
 
 
 """
@@ -126,9 +126,7 @@ Entering the number in the url (.../albums/1) returns album with id=1 from the D
 """
 def test_show_album_1(page, test_web_address, db_connection):
     db_connection.seed("seeds/music_web_app_html.sql")
-
     page.goto(f"http://{test_web_address}/albums/1")
-
     paragraph_tags = page.locator("p")
 
     expect(paragraph_tags).to_have_text(['\n                Released: 1989\n            '])
@@ -144,8 +142,35 @@ def test_click_album_sends_to_page_and_go_back(page, test_web_address, db_connec
     page.click("text='Waterloo'")
     h1_tag = page.locator("h1")
     expect(h1_tag).to_have_text("Album: Waterloo")
+
     paragraph_tag = page.locator("p")
     expect(paragraph_tag).to_have_text("Released: 1974")
+
     page.click("text='Back to all albums'")
     h1_tag = page.locator("h1")
     expect(h1_tag).to_have_text("Albums")
+
+
+"""
+Given an artist id
+Entering the number in the url (.../artists/1) returns artist with id=1 from the DB
+"""
+def test_show_artist_1(page, test_web_address, db_connection):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/artists/1")
+    paragraph_tags = page.locator("p")
+
+    expect(paragraph_tags).to_have_text(['\n                Genre: Rock\n            '])
+
+
+"""
+When: I make a GET request to /artists
+Then: I should get a 200 response with a list of artists, as html
+"""
+def test_get_all_artists(page, test_web_address, db_connection):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/artists")
+
+    paragraph_tags = page.locator("p")
+
+    expect(paragraph_tags).to_have_text(['\n                    Pixies\n                ', '\n                    ABBA\n                ', '\n                    Taylor Swift\n                ', '\n                    Nina Simone\n                '])
