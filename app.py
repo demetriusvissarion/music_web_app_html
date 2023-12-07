@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 from lib.database_connection import get_flask_database_connection
 from lib.album import Album
 from lib.album_repository import AlbumRepository
@@ -23,27 +23,52 @@ def get_emoji():
 # == Your Routes Here ==
 
 
-# Request:
+# # Request:
+# # POST /albums
+# #   With body parameter: title=Voyage, release_year=2022, artist_id=2
+# @app.route('/albums', methods=['POST'])
+# def create_album():
+#     if check_if_data_is_valid(request.form):
+#         return "No data to create album", 400
+#     connection = get_flask_database_connection(app)
+#     album_repository = AlbumRepository(connection)
+
+#     title = request.form['title'] 
+#     release_year = request.form['release_year'] 
+#     artist_id = request.form['artist_id']
+#     album = Album(None, title, release_year, artist_id)
+#     album_repository.create(album)
+#     return '', 200
+
+# def check_if_data_is_valid(form):
+#     return 'title' not in form or \
+#         'release_year' not in form or \
+#         'artist_id' not in form
 # POST /albums
-#   With body parameter: title=Voyage, release_year=2022, artist_id=2
+# Creates a new album
 @app.route('/albums', methods=['POST'])
 def create_album():
-    if check_if_data_is_valid(request.form):
-        return "No data to create album", 400
+    # Set up the database connection and repository
     connection = get_flask_database_connection(app)
-    album_repository = AlbumRepository(connection)
+    repository = AlbumRepository(connection)
 
-    title = request.form['title'] 
-    release_year = request.form['release_year'] 
+    # Get the fields from the request form
+    title = request.form['title']
+    release_year = request.form['release_year']
     artist_id = request.form['artist_id']
-    album = Album(None, title, release_year, artist_id)
-    album_repository.create(album)
-    return '', 200
 
-def check_if_data_is_valid(form):
-    return 'title' not in form or \
-        'release_year' not in form or \
-        'artist_id' not in form
+    # Create a album object
+    album = Album(None, title, release_year, artist_id)
+
+    # Check for validity and if not valid, show the form again with errors
+    if not album.is_valid():
+        return render_template('albums/new.html', album=album, errors=album.generate_errors()), 400
+
+    # Save the album to the database
+    album = repository.create(album)
+
+    # Redirect to the album's show route to the user can see it
+    return redirect(f"/albums/{album.album_id}")
 
 
 # Request:
@@ -64,7 +89,14 @@ def get_all_records():
     return render_template('albums/index.html', albums=albums)
 
 
-@app.route('/albums/<album_id>', methods=['GET'])
+# GET /albums/new
+# Returns a form to create a new album
+@app.route('/albums/new', methods=['GET'])
+def get_new_album():
+    return render_template('albums/new.html')
+
+
+@app.route('/albums/<int:album_id>', methods=['GET'])
 def get_album_by_id(album_id):
     connection = get_flask_database_connection(app)
     album_repository = AlbumRepository(connection)
@@ -83,7 +115,7 @@ def get_all_artists():
     return render_template('artists/index.html', artists=artists)
 
 
-@app.route('/artists/<artist_id>', methods=['GET'])
+@app.route('/artists/<int:artist_id>', methods=['GET'])
 def get_artist_by_id(artist_id):
     connection = get_flask_database_connection(app)
     artist_repository = ArtistRepository(connection)

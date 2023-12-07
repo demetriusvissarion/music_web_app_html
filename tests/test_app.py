@@ -21,20 +21,20 @@ def test_get_emoji(web_client):
 # === End Example Code ===
 
 
-"""
-When: I make a POST request to /albums
-Then: I should get a 200 response
-"""
-def test_post_create_album(db_connection, web_client):
-    db_connection.seed("seeds/music_web_app_html.sql")
-    response = web_client.post('/albums', data={
-        'title': 'Voyage', 
-        'release_year': '2022', 
-        'artist_id': '2'
-        })
+# """
+# When: I make a POST request to /albums
+# Then: I should get a 200 response
+# """
+# def test_post_create_album(db_connection, web_client, test_web_address):
+#     db_connection.seed("seeds/music_web_app_html.sql")
+#     response = web_client.post('/albums', data={
+#         'title': 'Voyage', 
+#         'release_year': '2022', 
+#         'artist_id': '2'
+#         })
 
-    assert response.status_code == 200
-    assert response.data.decode('utf-8') == ''
+#     assert response.status_code == 200
+#     assert response.data.decode('utf-8') == ''
 
 
 """
@@ -174,3 +174,48 @@ def test_get_all_artists(page, test_web_address, db_connection):
     paragraph_tags = page.locator("p")
 
     expect(paragraph_tags).to_have_text(['\n                    Pixies\n                ', '\n                    ABBA\n                ', '\n                    Taylor Swift\n                ', '\n                    Nina Simone\n                '])
+
+
+"""
+When we create a new album
+We see it in the albums index
+"""
+def test_create_album(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/albums")
+
+    # This time we click the link with the text 'Add a new album'
+    page.click("text=Add a new album")
+
+    # Then we fill out the field with the name attribute 'title' # Voyage, 2021, 2
+    page.fill("input[name='title']", "Voyage")
+
+    # And the field with the name attribute 'release_year'
+    page.fill("input[name='release_year']", '2021')
+
+    # And the field with the name attribute 'artist_id'
+    page.fill("input[name='artist_id']", '2')
+
+    # Finally we click the button with the text 'Create Album'
+    page.click("text=Create Album")
+
+    # Just as before, the virtual browser acts just like a normal browser and
+    # goes to the next page without us having to tell it to.
+
+    title_element = page.locator(".t-title")
+    expect(title_element).to_have_text("Album: Voyage")
+
+    release_year_element = page.locator(".t-release-year")
+    expect(release_year_element).to_have_text("Released: 2021")
+
+"""
+If we create a new album without a title or release_year or artist_id
+We see an error message
+"""
+def test_create_album_error(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/albums")
+    page.click("text=Add a new album")
+    page.click("text=Create Album")
+    errors = page.locator(".t-errors")
+    expect(errors).to_have_text("There were errors with your submission: Title can't be blank, Release Year can't be blank, Artist ID can't be blank")
