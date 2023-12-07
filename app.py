@@ -22,28 +22,11 @@ def get_emoji():
 
 # == Your Routes Here ==
 
+@app.route('/')
+def get_homepage():
+    return render_template('homepage.html')
 
-# # Request:
-# # POST /albums
-# #   With body parameter: title=Voyage, release_year=2022, artist_id=2
-# @app.route('/albums', methods=['POST'])
-# def create_album():
-#     if check_if_data_is_valid(request.form):
-#         return "No data to create album", 400
-#     connection = get_flask_database_connection(app)
-#     album_repository = AlbumRepository(connection)
 
-#     title = request.form['title'] 
-#     release_year = request.form['release_year'] 
-#     artist_id = request.form['artist_id']
-#     album = Album(None, title, release_year, artist_id)
-#     album_repository.create(album)
-#     return '', 200
-
-# def check_if_data_is_valid(form):
-#     return 'title' not in form or \
-#         'release_year' not in form or \
-#         'artist_id' not in form
 # POST /albums
 # Creates a new album
 @app.route('/albums', methods=['POST'])
@@ -71,16 +54,7 @@ def create_album():
     return redirect(f"/albums/{album.album_id}")
 
 
-# Request:
-# GET /albums
-#   With body parameter: 
-# @app.route('/albums', methods=['GET'])
-# def get_all_records():
-#     connection = get_flask_database_connection(app)
-#     album_repository = AlbumRepository(connection)
-#     return "\n".join(
-#         f"{album}" for album in album_repository.all()
-#     )
+
 @app.route('/albums/', methods=['GET'])
 def get_all_records():
     connection = get_flask_database_connection(app)
@@ -126,18 +100,44 @@ def get_artist_by_id(artist_id):
 # Request:
 # POST /artists
 #   With body parameter: artist_name=Queen, genre=Rock
+# @app.route('/artists', methods=['POST'])
+# def post_new_artist():
+#     connection = get_flask_database_connection(app)
+#     repository = ArtistRepository(connection)
+#     artist_name = request.form['artist_name'] 
+#     genre = request.form['genre'] 
+#     artist = Artist(None, artist_name, genre)
+#     repository.create(artist) 
+#     return '', 200
 @app.route('/artists', methods=['POST'])
-def post_new_artist():
+def create_artist():
+    # Set up the database connection and repository
     connection = get_flask_database_connection(app)
     repository = ArtistRepository(connection)
 
-    artist_name = request.form['artist_name'] 
-    genre = request.form['genre'] 
+    # Get the fields from the request form
+    artist_name = request.form['artist_name']
+    genre = request.form['genre']
+
+    # Create a artist object
     artist = Artist(None, artist_name, genre)
-    repository.create(artist) 
-    return '', 200
+
+    # Check for validity and if not valid, show the form again with errors
+    if not artist.is_valid():
+        return render_template('artists/new.html', artist=artist, errors=artist.generate_errors()), 400
+
+    # Save the artist to the database
+    artist = repository.create(artist)
+
+    # Redirect to the artist's show route to the user can see it
+    return redirect(f"/artists/{artist.artist_id}")
 
 
+# GET /artists/new
+# Returns a form to create a new artist
+@app.route('/artists/new', methods=['GET'])
+def get_new_artist():
+    return render_template('artists/new.html')
 
 
 # These lines start the server if you run this file directly

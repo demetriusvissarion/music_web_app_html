@@ -219,3 +219,45 @@ def test_create_album_error(db_connection, page, test_web_address):
     page.click("text=Create Album")
     errors = page.locator(".t-errors")
     expect(errors).to_have_text("There were errors with your submission: Title can't be blank, Release Year can't be blank, Artist ID can't be blank")
+
+
+"""
+When we create a new artist
+We see it in the artists index
+"""
+def test_create_artist(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/artists")
+
+    # This time we click the link with the text 'Add a new artist'
+    page.click("text=Add a new artist")
+
+    # Then we fill out the field with the name attribute 'artist_name' #Czarface Hip-Hop/Rap - 2015	Every Hero Needs a Villain
+    page.fill("input[name='artist_name']", "Czarface")
+
+    # And the field with the name attribute 'genre'
+    page.fill("input[name='genre']", 'Hip-Hop/Rap')
+
+    # Finally we click the button with the text 'Create Artist'
+    page.click("text=Create Artist")
+
+    # Just as before, the virtual browser acts just like a normal browser and
+    # goes to the next page without us having to tell it to.
+
+    artist_name_element = page.locator(".t-artist-name")
+    expect(artist_name_element).to_have_text("Artist: Czarface")
+
+    genre_element = page.locator(".t-genre")
+    expect(genre_element).to_have_text("Genre: Hip-Hop/Rap")
+
+"""
+If we create a new artist without a artist_name or genre
+We see an error message
+"""
+def test_create_artist_error(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_web_app_html.sql")
+    page.goto(f"http://{test_web_address}/artists")
+    page.click("text=Add a new artist")
+    page.click("text=Create Artist")
+    errors = page.locator(".t-errors")
+    expect(errors).to_have_text("There were errors with your submission: Artist name can't be blank, Genre can't be blank")
